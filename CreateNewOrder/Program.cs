@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Consumer
+namespace CreateNewOrder
 {
     class Program
     {
