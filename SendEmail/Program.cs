@@ -15,7 +15,7 @@ namespace SendEmail
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
-            using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build()){
+            using (var consumer = new ConsumerBuilder<string, string>(config).Build()){
                 consumer.Subscribe("PETSHOP_SEND_EMAIL");
                 var cts = new CancellationTokenSource();
 

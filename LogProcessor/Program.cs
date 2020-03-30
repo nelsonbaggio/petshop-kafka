@@ -16,7 +16,7 @@ namespace LogProcessor
         AutoOffsetReset = AutoOffsetReset.Earliest
       };
 
-      using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
+      using (var consumer = new ConsumerBuilder<string, string>(config).Build())
       {
         IEnumerable<string> topics = new string[]
         {

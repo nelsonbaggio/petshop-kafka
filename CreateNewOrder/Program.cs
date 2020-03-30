@@ -9,34 +9,38 @@ namespace Producer
     {
       var config = new ProducerConfig { BootstrapServers = "localhost:9092" };
 
-      var message = new Random().Next().ToString();
-      var email = $"Processing new order: ['{message}']";
-
-      using (var producer = new ProducerBuilder<Null, string>(config).Build())
+      for (var i = 0; i < 10; i++)
       {
+        var message = new Random().Next().ToString();
+        var email = $"Processing new order: ['{message}']";
+        var key = $"'{Guid.NewGuid().ToString()}' - '{message}'";
+        using (var producer = new ProducerBuilder<string, string>(config).Build())
         {
-          try
           {
-            var sendNewOrder = producer
-                                .ProduceAsync("PETSHOP_NEW_ORDER", new Message<Null, string> { Value = message })
-                                    .GetAwaiter()
-                                        .GetResult();
+            try
+            {
+              var sendNewOrder = producer
+                                  .ProduceAsync("PETSHOP_NEW_ORDER", new Message<string, string> { Key = key, Value = message })
+                                      .GetAwaiter()
+                                          .GetResult();
 
-            Console.WriteLine($"New Order: '{sendNewOrder.Value}' ['{sendNewOrder.TopicPartitionOffset}']");
+              Console.WriteLine($"New Order: '{sendNewOrder.Value}' ['{sendNewOrder.TopicPartitionOffset}']");
 
-            var sendEmail = producer
-                                .ProduceAsync("PETSHOP_SEND_EMAIL", new Message<Null, string> { Value = email })
-                                    .GetAwaiter()
-                                        .GetResult();
+              var sendEmail = producer
+                                  .ProduceAsync("PETSHOP_SEND_EMAIL", new Message<string, string> { Key = key, Value = email })
+                                      .GetAwaiter()
+                                          .GetResult();
 
-            Console.WriteLine($"Email: '{sendEmail.Value}' ['{sendEmail.TopicPartitionOffset}']");
-          }
-          catch (ProduceException<Null, string> e)
-          {
-            Console.WriteLine($"New Order failed: {e.Error.Reason}");
+              Console.WriteLine($"Email: '{sendEmail.Value}' ['{sendEmail.TopicPartitionOffset}']");
+            }
+            catch (ProduceException<Null, string> e)
+            {
+              Console.WriteLine($"New Order failed: {e.Error.Reason}");
+            }
           }
         }
       }
     }
+
   }
 }
