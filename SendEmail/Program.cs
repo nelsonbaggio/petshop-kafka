@@ -2,7 +2,7 @@
 using System.Threading;
 using Confluent.Kafka;
 
-namespace ProcessNewOrder
+namespace SendEmail
 {
     class Program
     {
@@ -10,13 +10,13 @@ namespace ProcessNewOrder
         {
             var config = new ConsumerConfig
             {
-                GroupId = "new-pet-group-3",
+                GroupId = "new-pet-group-4",
                 BootstrapServers = "localhost:9092",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
             using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build()){
-                consumer.Subscribe("PETSHOP_NEW_ORDER");
+                consumer.Subscribe("PETSHOP_SEND_EMAIL");
                 var cts = new CancellationTokenSource();
 
                  try
@@ -25,7 +25,7 @@ namespace ProcessNewOrder
                     {
                         var message = consumer.Consume(cts.Token);
                         Console.WriteLine("------------------------------------------------");
-                        Console.WriteLine($"Mensagem: {message.Value} recebida de {message.TopicPartitionOffset}");
+                        Console.WriteLine($"Email enviado: {message.Value} [{message.TopicPartitionOffset}]");
                     }
                 }
                 catch (OperationCanceledException)
